@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import createHttpError from "http-errors";
 import { createUser } from "../services/auth.services";
-import logger from "../utils/logger";
 
 export default {
   getRegister: async (req: Request, res: Response, next: NextFunction) => {

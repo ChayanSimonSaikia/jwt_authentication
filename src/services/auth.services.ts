@@ -1,11 +1,11 @@
 import createHttpError from "http-errors";
 import { DocumentDefinition } from "mongoose";
 import { register_userSchema } from "../helpers/validation";
-import UserModel, { UserDocument } from "../models/User.model";
+import UserModel, { User } from "../models/User.model";
 
 export const createUser = async (
-  input: DocumentDefinition<UserDocument>
-): Promise<UserDocument> => {
+  input: DocumentDefinition<User>
+): Promise<User> => {
   try {
     const sanitized = await register_userSchema.validateAsync(input);
 

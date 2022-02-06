@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import logger from "../utils/logger";
 import createHttpError from "http-errors";
 
-export interface UserDocument extends mongoose.Document {
+export interface User {
   name: string;
   email: string;
   password: string;
@@ -11,7 +11,7 @@ export interface UserDocument extends mongoose.Document {
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
-const userSchema = new Schema(
+const userSchema = new Schema<User>(
   {
     name: { type: String, required: true },
     email: { type: String, unique: true, required: true },
@@ -22,13 +22,11 @@ const userSchema = new Schema(
 
 userSchema.pre("save", async function (next) {
   try {
-    let user = this as UserDocument;
-
-    if (!user.isModified("password")) return next();
+    if (!this.isModified("password")) return next();
 
     const salt = await bcrypt.genSalt(10);
-    const hashed = await bcrypt.hash(user.password, salt);
-    user.password = hashed;
+    const hashed = await bcrypt.hash(this.password, salt);
+    this.password = hashed;
 
     return next();
   } catch (error: any) {
@@ -42,8 +40,7 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.comparePassword = function (
   candidatePassword: string
 ): Promise<boolean> {
-  const user = this as UserDocument;
-  return bcrypt.compare(candidatePassword, user.password);
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 const userModel = mongoose.model("User", userSchema);
