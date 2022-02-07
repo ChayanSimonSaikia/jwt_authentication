@@ -2,6 +2,7 @@ import JWT, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 import config from "config";
 import createHttpError from "http-errors";
 import logger from "./logger";
+import { Request, Response, NextFunction, Express } from "express";
 
 export const sign_AccessToken = (
   user_id: string
@@ -45,5 +46,33 @@ export const sign_RefreshToken = (user_id: string): Promise<string> => {
       if (!token) throw new createHttpError.InternalServerError();
       resolve(token);
     });
+  });
+};
+declare global {
+  namespace Express {
+    interface Request {
+      userid: string | JWT.JwtPayload | undefined;
+    }
+  }
+}
+export const verify_token = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const auth_header = req.headers["authorization"];
+  if (!auth_header) throw new createHttpError.Unauthorized();
+
+  const bearer = auth_header.split(" ");
+  const token = bearer[1];
+  JWT.verify(token, config.get<string>("ACCESS_TOKEN_KEY"), (err, payload) => {
+    if (err) {
+      const message =
+        err.name === "JsonWebTokenError" ? "Unauthorized" : err.message;
+      return next(new createHttpError.Unauthorized(message));
+    }
+    if (!payload) throw new createHttpError.Unauthorized();
+    req.userid = payload.sub;
+    next();
   });
 };

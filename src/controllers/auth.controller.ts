@@ -5,7 +5,7 @@ import { sign_AccessToken, sign_RefreshToken } from "../utils/init_token";
 
 export default {
   /** GET REQUESTS **/
-  register__GET: async (req: Request, res: Response, next: NextFunction) => {
+  profile__GET: async (req: Request, res: Response, next: NextFunction) => {
     res.send("Register Page");
   },
 
