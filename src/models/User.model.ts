@@ -1,9 +1,10 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 import logger from "../utils/logger";
 import createHttpError from "http-errors";
 
 export interface User {
+  _id: Schema.Types.ObjectId;
   name: string;
   email: string;
   password: string;
@@ -11,6 +12,7 @@ export interface User {
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
+// Schema
 const userSchema = new Schema<User>(
   {
     name: { type: String, required: true },
@@ -22,11 +24,13 @@ const userSchema = new Schema<User>(
 
 userSchema.pre("save", async function (next) {
   try {
-    if (!this.isModified("password")) return next();
+    const user = this as User & Document;
+
+    if (!user.isModified("password")) return next();
 
     const salt = await bcrypt.genSalt(10);
-    const hashed = await bcrypt.hash(this.password, salt);
-    this.password = hashed;
+    const hashed = await bcrypt.hash(user.password, salt);
+    user.password = hashed;
 
     return next();
   } catch (error: any) {
