@@ -1,10 +1,7 @@
 import createHttpError from "http-errors";
-import { DocumentDefinition, Document } from "mongoose";
-import { resolve } from "path/posix";
+import { DocumentDefinition } from "mongoose";
 import { login_userSchema, register_userSchema } from "../helpers/validation";
 import UserModel, { User } from "../models/User.model";
-import client from "../utils/init_redis";
-import { sign_AccessToken, sign_RefreshToken } from "../utils/init_token";
 
 export const createUser = async (
   input: DocumentDefinition<User>
@@ -29,8 +26,6 @@ export const createUser = async (
 
 export const loginUser = async (input: DocumentDefinition<User>) => {
   try {
-    console.log(input);
-
     // Validate inputs
     const { email, password } = await login_userSchema.validateAsync(input);
     console.log(email, password);
