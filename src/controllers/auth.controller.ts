@@ -3,7 +3,7 @@ import { createUser, loginUser } from "../services/auth.services";
 import client from "../utils/init_redis";
 import { sign_AccessToken, sign_RefreshToken } from "../utils/init_token";
 
-export function profile__GET(_req: Request, res: Response) {
+export function profile__GET(req: Request, res: Response) {
   res.send("Register Page");
 }
 

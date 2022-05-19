@@ -48,13 +48,7 @@ export const sign_RefreshToken = (user_id: string): Promise<string> => {
     });
   });
 };
-declare global {
-  namespace Express {
-    interface Request {
-      userid: string | JWT.JwtPayload | undefined;
-    }
-  }
-}
+
 export const verify_token = (
   req: Request,
   res: Response,
@@ -72,7 +66,7 @@ export const verify_token = (
       return next(new createHttpError.Unauthorized(message));
     }
     if (!payload) throw new createHttpError.Unauthorized();
-    req.userid = payload.sub;
+    res.locals.userid = payload.sub;
     next();
   });
 };
